@@ -15,6 +15,7 @@ class Commuter {
     }
 
   void init (){  
+    //inits the conmuter
     pinMode (toggle , INPUT);
     pinMode (relay , OUTPUT);
   }
