@@ -1,8 +1,6 @@
+//usign IRremote 2.0.1
 #include <IRremote.h>
 
-//IR codes for on/off
-//byte irOff = 0x0020DF18E7;
-//byte irOn= 0x0020DFE817;
 
 
 byte receiver = 7;
@@ -22,6 +20,7 @@ class Commuter {
   
   
   public:
+  //constructor
   Commuter(byte toggle, byte relay, byte irOn, byte irOff){
     this->toggle = toggle;
     this->relay= relay;
@@ -62,13 +61,14 @@ void printStatus (){
   
           
   void setToggleStatus(){
+    //changes toggle's actual statue
       if (_toggleStatus == HIGH){
           _toggleStatus= LOW;
         }else {
           _toggleStatus= HIGH;
         }        
   }
-
+//experimental IR management 
   void setIr(){
     if (irrecv.decode(&results)){
       if (results.value == 0x0020DFE817){
@@ -86,6 +86,7 @@ void printStatus (){
   }
 
   void setCommuter(){
+    //detects if any change has happend in toggle status 
     int toggleReading= digitalRead(toggle);
     if (toggleReading != _toggleStatus){
       delay(50);
@@ -95,21 +96,16 @@ void printStatus (){
   }
 };
 
-
+//Commuter instance recives, toggle input pin, relay output pin and ir on and off codes
 Commuter Conmutador1 (4,13, 0x0020DFE817, 0x0020DF18E7);
 
 
 void setup() {
   Serial.begin (9600);
   irrecv.enableIRIn();
-
-
 }
 
 void loop() {
-
 Conmutador1.setIr();
 Conmutador1.setCommuter();
-
-
 }
