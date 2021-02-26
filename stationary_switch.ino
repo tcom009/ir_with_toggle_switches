@@ -78,7 +78,7 @@ public:
   //experimental IR management
   void setIr()
   {
-    if (irrecv.decode(&results))
+    if (irrecv.decode())
     {
       if (irrecv.decodedIRData.decodedRawData == _irOn)
       {
