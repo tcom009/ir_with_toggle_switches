@@ -1,94 +1,109 @@
 //usign IRremote 2.0.1
 #include <IRremote.h>
 
-
-
 byte receiver = 7;
 IRrecv irrecv(receiver);
 decode_results results;
 
+class Commuter
+{
 
-class Commuter {
-  
-  private:
+private:
   byte toggle;
   byte relay;
   int _toggleStatus;
   int _relayStatus;
-  byte _irOn;
-  byte _irOff;
-  
-  
-  public:
-  //constructor
-  Commuter(byte toggle, byte relay, byte irOn, byte irOff){
-    this->toggle = toggle;
-    this->relay= relay;
-    this->_irOff=irOff;
-    this->_irOn=irOn;
-    this->_relayStatus=_relayStatus;
-    this->_toggleStatus=_toggleStatus;
-    init(); 
-    }
+  unsigned int _irOn;
+  unsigned int _irOff;
 
-  void init (){  
-    //inits the conmuter
-    pinMode (toggle , INPUT);
-    pinMode (relay , OUTPUT);
+public:
+  //constructor
+  Commuter(byte toggle, byte relay, unsigned int irOn, unsigned int irOff)
+  {
+    this->toggle = toggle;
+    this->relay = relay;
+    this->_irOff = irOff;
+    this->_irOn = irOn;
+    this->_relayStatus = _relayStatus;
+    this->_toggleStatus = _toggleStatus;
+    init();
   }
 
-  
-void printStatus (){
-  Serial.print( "Estado relay #");
-          Serial.print(relay);
-          Serial.print( ": ");
-          Serial.println(_relayStatus);
-}
+  void init()
+  {
+    //inits the conmuter
+    pinMode(toggle, INPUT);
+    pinMode(relay, OUTPUT);
+  }
 
-  void setRelayStatus(){
+  void printStatus()
+  {
+    Serial.print("Estado relay #");
+    Serial.print(relay);
+    Serial.print(": ");
+    Serial.println(_relayStatus);
+  }
+
+  void setRelayStatus()
+  {
     //Changes status negating the actual state of the relay
 
-        if (_relayStatus == HIGH){
-          _relayStatus= LOW;
-        }else {
-          if (_relayStatus== LOW){
-          _relayStatus= HIGH;
-            }
-        }
-          digitalWrite (relay, _relayStatus);
-          printStatus();
-        }
-  
-          
-  void setToggleStatus(){
-    //changes toggle's actual statue
-      if (_toggleStatus == HIGH){
-          _toggleStatus= LOW;
-        }else {
-          _toggleStatus= HIGH;
-        }        
+    if (_relayStatus == HIGH)
+    {
+      _relayStatus = LOW;
+    }
+    else
+    {
+      if (_relayStatus == LOW)
+      {
+        _relayStatus = HIGH;
+      }
+    }
+    digitalWrite(relay, _relayStatus);
+    printStatus();
   }
-//experimental IR management 
-  void setIr(){
-    if (irrecv.decode(&results)){
-      if (results.value == 0x0020DFE817){
-        _relayStatus =HIGH;
-      }else {
-        if (results.value== 0x0020DF18E7){
-          _relayStatus =LOW;
-          }
+
+  void setToggleStatus()
+  {
+    //changes toggle's actual statue
+    if (_toggleStatus == HIGH)
+    {
+      _toggleStatus = LOW;
+    }
+    else
+    {
+      _toggleStatus = HIGH;
+    }
+  }
+  //experimental IR management
+  void setIr()
+  {
+    if (irrecv.decode(&results))
+    {
+      if (irrecv.decodedIRData.decodedRawData == _irOn)
+      {
+        _relayStatus = HIGH;
+      }
+      else
+      {
+        if (irrecv.decodedIRData.decodedRawData == _irOff)
+        {
+          _relayStatus = LOW;
         }
-        Serial.println (results.value);
+      }
+      Serial.println(results.value);
       digitalWrite(relay, _relayStatus);
       printStatus();
     }
-  irrecv.resume();
+    irrecv.resume();
   }
 
-  void setCommuter(){
-    //detects if any change has happend in toggle status 
-    int toggleReading= digitalRead(toggle);
-    if (toggleReading != _toggleStatus){
+  void setCommuter()
+  {
+    //detects if any change has happend in toggle status
+    int toggleReading = digitalRead(toggle);
+    if (toggleReading != _toggleStatus)
+    {
       delay(50);
       setRelayStatus();
       setToggleStatus();
@@ -97,15 +112,16 @@ void printStatus (){
 };
 
 //Commuter instance recives, toggle input pin, relay output pin and ir on and off codes
-Commuter Conmutador1 (4,13, 0x0020DFE817, 0x0020DF18E7);
+Commuter Conmutador1(4, 13, 0xFE01BF40, 0xFD02BF40);
 
-
-void setup() {
-  Serial.begin (9600);
+void setup()
+{
+  Serial.begin(9600);
   irrecv.enableIRIn();
 }
 
-void loop() {
-Conmutador1.setIr();
-Conmutador1.setCommuter();
+void loop()
+{
+  Conmutador1.setIr();
+  Conmutador1.setCommuter();
 }
