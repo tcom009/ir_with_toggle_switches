@@ -13,12 +13,12 @@ private:
   byte relay;
   int _toggleStatus;
   int _relayStatus;
-  unsigned int _irOn;
-  unsigned int _irOff;
+  byte _irOn;
+  byte _irOff;
 
 public:
   //constructor
-  Commuter(byte toggle, byte relay, unsigned int irOn, unsigned int irOff)
+  Commuter(byte toggle, byte relay, byte irOn, byte irOff)
   {
     this->toggle = toggle;
     this->relay = relay;
@@ -84,14 +84,10 @@ public:
       {
         _relayStatus = HIGH;
       }
-      else
+      if (irrecv.decodedIRData.decodedRawData == _irOff)
       {
-        if (irrecv.decodedIRData.decodedRawData == _irOff)
-        {
-          _relayStatus = LOW;
-        }
+        _relayStatus = LOW;
       }
-      Serial.println(results.value);
       digitalWrite(relay, _relayStatus);
       printStatus();
     }
