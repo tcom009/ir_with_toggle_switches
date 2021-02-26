@@ -93,7 +93,7 @@ public:
         digitalWrite(relay, _relayStatus);
         printStatus();
       }
-        }
+    }
     irrecv.resume();
   }
 
@@ -117,6 +117,7 @@ void setup()
 {
   Serial.begin(9600);
   irrecv.enableIRIn();
+  Serial.println("---Listo para recibir ordenes---")
 }
 
 void loop()
