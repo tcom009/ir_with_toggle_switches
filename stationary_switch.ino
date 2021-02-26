@@ -13,12 +13,12 @@ private:
   byte relay;
   int _toggleStatus;
   int _relayStatus;
-  byte _irOn;
-  byte _irOff;
+  long _irOn;
+  long _irOff;
 
 public:
   //constructor
-  Commuter(byte toggle, byte relay, byte irOn, byte irOff)
+  Commuter(byte toggle, byte relay, long irOn, long irOff)
   {
     this->toggle = toggle;
     this->relay = relay;
@@ -80,17 +80,20 @@ public:
   {
     if (irrecv.decode())
     {
-      if (irrecv.decodedIRData.decodedRawData == _irOn)
+      long data = irrecv.decodedIRData.decodedRawData;
+      if (data == _irOn)
       {
         _relayStatus = HIGH;
+        digitalWrite(relay, _relayStatus);
+        printStatus();
       }
-      if (irrecv.decodedIRData.decodedRawData == _irOff)
+      if (data == _irOff)
       {
         _relayStatus = LOW;
+        digitalWrite(relay, _relayStatus);
+        printStatus();
       }
-      digitalWrite(relay, _relayStatus);
-      printStatus();
-    }
+        }
     irrecv.resume();
   }
 
