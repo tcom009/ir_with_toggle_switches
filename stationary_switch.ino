@@ -15,7 +15,8 @@ private:
   byte _toggleStatus;
   byte _relayStatus;
   byte _pushStatus;
-  bool is_open = false;
+  byte _lastPushStatus;
+  bool _is_open;
   long _irOn;
   long _irOff;
   unsigned long lastDebounceTime = 0;
@@ -23,6 +24,9 @@ private:
 
   void printStatus()
   {
+    String device = Commuter::getDeviceType();
+    Serial.print("Device: ");
+    Serial.println(device);
     Serial.print("Estado relay #");
     Serial.print(relay);
     Serial.print(": ");
@@ -66,12 +70,12 @@ public:
   Commuter(byte push, bool is_open, byte relay, long irOn, long irOff)
   {
     this->push = push;
-    this->is_open = is_open;
+    this->_is_open = is_open;
     this->relay = relay;
     this->_irOff = irOff;
     this->_irOn = irOn;
     this->_relayStatus = _relayStatus;
-    this->_pushStatus = _pushStatus;
+    _is_open == true ? this->_lastPushStatus = LOW : this->_lastPushStatus = HIGH;
     init();
   }
   Commuter(byte toggle, byte relay, long irOn, long irOff)
@@ -147,13 +151,33 @@ public:
   void setCommuter()
   {
     //detects if any change has happend in toggle status
+    String device = Commuter::getDeviceType();
     setIr();
-    int toggleReading = digitalRead(toggle);
-    if (toggleReading != _toggleStatus)
+    if (device == "TOGGLE")
     {
-      delay(50);
-      setRelayStatus();
-      setToggleStatus();
+      int toggleReading = digitalRead(toggle);
+      if (toggleReading != _toggleStatus)
+      {
+        lastDebounceTime = millis();
+      }
+      if ((millis() - lastDebounceTime) > debounceDelay)
+      {
+        setRelayStatus();
+        setToggleStatus();
+      }
+    }
+
+    if (device == "PUSH")
+    {
+      int pushReading = digitalRead(push);
+      if (pushReading != _lastPushStatus)
+      {
+        lastDebounceTime = millis();
+      }
+      if ((millis() - lastDebounceTime) > debounceDelay)
+      {
+        setRelayStatus();
+      }
     }
   }
 
@@ -165,7 +189,7 @@ public:
 };
 
 //Commuter instance recives, toggle input pin, relay output pin and ir on and off codes
-Commuter toggle1(4, 13, 0xFE01BF40, 0xFD02BF40);
+Commuter toggle1(4, false, 13, 0xFE01BF40, 0xFD02BF40);
 
 void setup()
 {
