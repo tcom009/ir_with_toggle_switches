@@ -1,6 +1,8 @@
 //usign IRremote 2.0.1
 #include <IRremote.h>
+#include "RTClib.h"
 
+RTC_DS1307 rtc;
 byte receiver = 7;
 IRrecv irrecv(receiver);
 decode_results results;
