@@ -60,6 +60,11 @@ private:
   }
 
 public:
+  Commuter(byte relay)
+  {
+    this->relay = relay;
+    pinMode(relay, OUTPUT);
+  }
   Commuter(byte relay, long irOn, long irOff)
   {
     this->relay = relay;
@@ -91,6 +96,40 @@ public:
     init();
   }
 
+  void setFromRTC(bool state)
+  {
+    if (state)
+    {
+      digitalWrite(relay, HIGH);
+      //printStatus();
+    }
+    else
+    {
+      digitalWrite(relay, LOW);
+      //printStatus();
+    }
+  }
+  void isScheduledON()
+  {
+    DateTime now = rtc.now();
+
+    int hour = now.hour();
+    /*int minutes = now.minute();*/
+
+    bool hourCondition = (hour > 19);
+    // Miercoles, Sabado o Domingo
+    //bool dayCondition = (weekDay == 3 || weekDay == 6 || weekDay == 0);
+    if (hourCondition)
+    {
+      Serial.println("luz encendida");
+      setFromRTC(true);
+    }
+    else
+    {
+
+      setFromRTC(false);
+    }
+  }
   String getDeviceType()
   {
     if (push == 0 && toggle != 0)
@@ -155,6 +194,7 @@ public:
     //detects if any change has happend in toggle status
     String device = Commuter::getDeviceType();
     setIr();
+
     if (device == "TOGGLE")
     {
       int toggleReading = digitalRead(toggle);
@@ -189,18 +229,40 @@ public:
     Serial.print(device);
   }
 };
+/*Commuter instance recives, toggle input pin, relay output pin and ir on and off codes*/
 
-//Commuter instance recives, toggle input pin, relay output pin and ir on and off codes
-Commuter toggle1(4, false, 13, 0xFE01BF40, 0xFD02BF40);
+Commuter lucesProgramadas(13);
 
 void setup()
 {
   Serial.begin(115200);
   irrecv.enableIRIn();
   Serial.println("---Listo para recibir ordenes---");
-}
+  if (!rtc.begin())
+  {
+    Serial.println("Couldn't find RTC");
+    Serial.flush();
+    abort();
+  }
 
+  if (!rtc.isrunning())
+  {
+    Serial.println("RTC is NOT running, let's set the time!");
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    // This line sets the RTC with an explicit date & time, for example to set
+    // January 21, 2014 at 3am you would call:
+    // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
+  }
+}
+//ScheduledOutput outlet(13);
 void loop()
 {
-  toggle1.setCommuter();
+  DateTime now = rtc.now();
+  int hora = now.hour();
+  int minutos = now.minute();
+  lucesProgramadas.isScheduledON();
+  Serial.print("la hora es: ");
+  Serial.print(hora);
+  Serial.print(":");
+  Serial.println(minutos);
 }
