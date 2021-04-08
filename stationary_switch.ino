@@ -6,6 +6,27 @@ RTC_DS1307 rtc;
 byte receiver = 7;
 IRrecv irrecv(receiver);
 decode_results results;
+unsigned long onIRCodes[8] = {
+    0xA888E157,
+    0xDA28F020,
+    0x2307B446,
+    0xC0E821D2,
+    0x5D8011C8,
+    0xFD213B16,
+    0x4B3D41B9,
+    0x2AD99623,
+
+} unsigned long offIRCodes[8] = {
+    0xDCB93B93,
+    0xE9D77D18,
+    0x35974D2F,
+    0x5061D043,
+    0x71D06673,
+    0x15E972C1,
+    0xA4A34BB,
+    0x7AD0864A,
+
+}
 
 class Commuter
 {
@@ -18,6 +39,8 @@ private:
   byte _relayStatus;
   byte _pushStatus;
   byte _lastPushStatus;
+  byte _hourOn;
+  byte _hourOff;
   bool _is_open;
   long _irOn;
   long _irOff;
@@ -60,9 +83,13 @@ private:
   }
 
 public:
-  Commuter(byte relay)
+  Commuter(byte relay) //, byte hourOn, byte hourOff, long irOn, long irOff)
   {
+    //this->hourOn = hourOn;
+    //this->hourOff = hourOff;
     this->relay = relay;
+    //this->_irOff = irOff;
+    //this->_irOn = irOn;
     pinMode(relay, OUTPUT);
   }
   Commuter(byte relay, long irOn, long irOff)
@@ -229,8 +256,9 @@ public:
     Serial.print(device);
   }
 };
-/*Commuter instance recives, toggle input pin, relay output pin and ir on and off codes*/
+/*Commuter instance recives, toggle input pin, relay output pin and ir on and off codes
 
+Commuter lucesProgramadas(13, 7, 6, 0xFE01BF40, 0xFD02BF40);*/
 Commuter lucesProgramadas(13);
 
 void setup()
