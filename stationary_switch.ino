@@ -63,8 +63,6 @@ public:
   Commuter(byte relay) //long irOn, long irOff)
   {
     this->relay = relay;
-    // this->_irOff = irOff;
-    // this->_irOn = irOn;
     this->_relayStatus = _relayStatus;
     this->deviceName = "OUTLET";
     init();
@@ -75,8 +73,6 @@ public:
     this->push = push;
     this->_is_open = is_open;
     this->relay = relay;
-    // this->_irOff = irOff;
-    // this->_irOn = irOn;
     this->_relayStatus = _relayStatus;
     this->deviceName = "PUSH";
     _is_open == true ? this->_lastPushStatus = LOW : this->_lastPushStatus = HIGH;
@@ -94,66 +90,9 @@ public:
     init();
   }
 
-  /*void setFromRTC(bool state)
-  {
-    if (state)
-    {
-      digitalWrite(relay, HIGH);
-      //printStatus();
-    }
-    else
-    {
-      digitalWrite(relay, LOW);
-      //printStatus();
-    }
-  }
-  void isScheduledON()
-  {
-    DateTime now = rtc.now();
-
-    int hour = now.hour();
-    /*int minutes = now.minute();
-
-  bool hourCondition = ((hour > onHour) && (hour < offHour));
-  // Miercoles, Sabado o Domingo
-  //bool dayCondition = (weekDay == 3 || weekDay == 6 || weekDay == 0);
-  if (hourCondition)
-  {
-    Serial.println("luz encendida");
-    setFromRTC(true);
-  }
-  else
-  {
-
-    setFromRTC(false);
-  }
-} */
-  /*String getDeviceType()
-  {
-    if (push == 0 && toggle != 0)
-    {
-
-      return "TOGGLE";
-    }
-    else
-    {
-      if (push != 0 && toggle == 0)
-      {
-        return "PUSH";
-      }
-      else
-      {
-        if (push == 0 && toggle == 0 && relay != 0)
-        {
-          return "OUTLET";
-        }
-      }
-    }
-  }*/
-
   void init()
   {
-    //String device = Commuter::getDeviceType();
+
     if (deviceName == "TOGGLE")
     {
       pinMode(toggle, INPUT);
@@ -215,15 +154,7 @@ public:
       }
     }
   }
-
-  /* void printDevice()
-  {
-    String device = Commuter::getDeviceType();
-    Serial.print(device);
-  }*/
 };
-//byte toggleSwitchPins[7] = {2, 3, 4, 5, 13, 14,15 };
-// byte relayPins[8] = {6, 10, 8, 9, 11, 12, 17, 18};
 
 Commuter luzBalcon(2, 6);
 Commuter luzRepisas(3, 10);
